@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Generator</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <h1>AI Story Generator</h1>
+    
+    <div id="controls">
+        <label for="genre-select">Pick a genre:</label>
+        <select id="genre-select">
+            <option value="fantasy">Fantasy</option>
+            <option value="scifi">Science Fiction</option>
+            <option value="mystery">Mystery</option>
+            <option value="adventure">Adventure</option>
+            <option value="fairytale">Fairy Tale</option>
+        </select>
+        
+        <label for="length-select">Story length:</label>
+        <select id="length-select">
+            <option value="short">Short</option>
+            <option value="medium">Medium</option>
+            <option value="long">Long</option>
+        </select>
+    </div>
+    
+    <div id="input-box">
+        <input type="text" id="user-input" placeholder="Type your story idea here...">
+        <button id="send-button">Create Story</button>
+    </div>
+    
+    <div id="chat-container"></div>
+    
+    <script src="index.js"></script>
+</body>
+</html>
