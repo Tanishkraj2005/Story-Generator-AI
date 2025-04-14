@@ -26,46 +26,54 @@ window.onload = function() {
 
 // Main function to create a story
 async function makeStory() {
-    // Get the user's idea
-    const idea = promptInput.value;
-    
-    // Check if user typed something
-    if (idea === '') {
-        alert("Please enter a story idea first!");
-        return;
-    }
-    
-    // Get the genre and length
-    const genre = genreDropdown.value;
-    const length = lengthDropdown.value;
-    
-    // Show user's request
-    showUserMessage("Create a " + genre + " story about: " + idea);
-    
-    // Clear input field
-    promptInput.value = '';
-    
-    // Show loading message
-    const loadingMessage = showBotMessage("Working on your story... please wait!");
-    
-    try {
-        // Get story from AI
-        const story = await getStoryFromAI(idea, genre, length);
-        
-        // Remove loading message
-        storyBox.removeChild(loadingMessage);
-        
-        // Show the story
-        showBotMessage(story);
-    } catch (error) {
-        // Remove loading message
-        storyBox.removeChild(loadingMessage);
-        
-        // Show error
-        showBotMessage("Sorry, I couldn't create your story. Try again!");
-        console.log("Error:", error);
-    }
+    const idea = promptInput.value.trim();
+
+    if (idea === '') {
+        alert("Please enter a story idea first!");
+        return;
+    }
+
+    // 🚫 Block known bad patterns (SQL, code, HTML, etc.)
+    const forbiddenPatterns = [
+        /SELECT|INSERT|DELETE|UPDATE|FROM|WHERE|DROP/i,
+        /<[^>]+>/,
+        /function\s*\(|=>|console\.log|let\s+|const\s+|var\s+/i,
+        /#include|System\.out\.println|public\s+class/i,
+        /<script\b[^>]*>(.*?)<\/script>/i
+    ];
+    if (forbiddenPatterns.some(pattern => pattern.test(idea))) {
+        showBotMessage("⚠️ Your input looks like code or instructions. Please enter a *story idea*, not code or SQL.");
+        return;
+    }
+
+    const genericInputs = [
+        "hello", "hi", "how are you", "what’s up", "hey", "ok", "good morning", "good evening"
+    ];
+    const lowered = idea.toLowerCase();
+    if (genericInputs.includes(lowered) || lowered.split(" ").length < 4) {
+        showBotMessage("❌ That doesn't sound like a story idea. Please try something like: *A lonely astronaut finds a talking rock on Mars*.");
+        return;
+    }
+
+    const genre = genreDropdown.value;
+    const length = lengthDropdown.value;
+
+    showUserMessage("Create a " + genre + " story about: " + idea);
+    promptInput.value = '';
+
+    const loadingMessage = showBotMessage("Working on your story... please wait!");
+
+    try {
+        const story = await getStoryFromAI(idea, genre, length);
+        storyBox.removeChild(loadingMessage);
+        showBotMessage(story);
+    } catch (error) {
+        storyBox.removeChild(loadingMessage);
+        showBotMessage("Sorry, I couldn't create your story. Try again!");
+        console.error("Error:", error);
+    }
 }
+
 
 // Function to get story from AI
 async function getStoryFromAI(idea, genre, length) {
